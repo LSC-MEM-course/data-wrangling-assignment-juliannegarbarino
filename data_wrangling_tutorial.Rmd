@@ -30,6 +30,7 @@ I'm not going to discuss issues of initial reading and cleaning data because tha
 
 ```{r}
 mysleep <- sleep
+mysleep<-sleep
 ```
 
 Once you have data loaded, almost always the very first thing you should do is to look at your data, and start to test your own assumptions about what it should look like.  This usually means plotting data, but even before plotting, there are a couple of things that are even quicker, that can help you get started.  First is just to make sure it looks like the data has been read in correctly, and you know more or less what the columns are and what's in them.  I like to use `head()` for this purpose.   
@@ -72,6 +73,15 @@ ggplot(mysleep, aes(extra)) + geom_histogram()
 
 That's better!  But we also get a warning about `stat_bin()`. In general, the authors of `tidyverse` functions are pretty liberal with warnings, because they like giving users various heads-ups about default decisions.  In this case, the warning is letting us know that a default value for the bin width of the histogram is set in order to produce 30 bins, but that may or may not be a good choice.  In the spirit of data exploration, playing around a little with bin widths can actually be very informative.  For example, there might be a "spike" of data around a specific value for some reason that hadn't occurred to us, but that may not be visible if the bins are set too wide, because that spike essentially gets smoothed over within the bin.  So this bring us to...
 
+
+```{r}
+ggplot(mysleep, aes(extra)) + geom_histogram(binwidth=2)
+ggplot(mysleep, aes(extra)) + geom_histogram(binwidth=1.5)
+ggplot(mysleep, aes(extra)) + geom_histogram(binwidth=1)
+ggplot(mysleep, aes(extra)) + geom_histogram(binwidth=0.5)
+ggplot(mysleep, aes(extra)) + geom_histogram(binwidth=0.05)
+```
+
 ## Practice Exercise #1
 
 Many of the options for plots are controlled by arguments within geoms. The `geom_histogram()` function has an argument called `binwidth`.  Continue looking at histograms of the `extra` variable from `mysleep`, and use the `binwidth` argument inside `geom_histogram` to try out the following bin widths:
@@ -83,6 +93,8 @@ Many of the options for plots are controlled by arguments within geoms. The `geo
   5. 0.05
 
 What does the value of bin width correspond to?  In other words, what is the scale of the bin width value?  Do these different views seem to tell us anything different?
+
+binwidth is the width of each column.
 
 As a reminder, you can look for the "solutions" to this exercise in [`data_wrangling_solutions.Rmd`](./data_wrangling_solutions.Rmd).  But also remember that those may not be the only solutions or even necesarily the best ones.  But take a peek after you have your own solution, or if you get *really* stuck and are starting to get really frustrated.
 
@@ -135,6 +147,13 @@ However, there is also a way to do this in the `tidyverse`, which can be conveni
 
 ```{r results = TRUE}
 mysleep <- mysleep %>% mutate(extra_std_tidy = as.numeric(scale(extra)))
+
+#it's like take mysleep and mutate extra_std_tidy into as.numeric(scale(extra))
+
+#read %>% as "and then." can put a bunch of them and they're done in order. is probably best to think of them being done to the firs tthing to the left of the first %>% 
+
+#help > cheat sheet
+
 ```
 
 I'll unpack this a bit, because I also threw in the `%>%` operator, which is a bit of syntactic sugar that is very commonly used in the `tidyverse`.
@@ -156,11 +175,36 @@ Back to the topic of `mutate()`, it is a nice, convenient way to transform data,
 ## Practice Exercise #2
 
 1. Create a new column in `mysleep` that is the square root of the absolute value of `extra`.
+```{r}
+mysleep$extra_sqrt<-sqrt(abs(mysleep$extra))
+mysleep<-mysleep %>% mutate(extra_sqrt = sqrt(abs(extra)))
+```
+
 
 2. Learn and practice how to use `ifelse()` to create or transform a variable conditional on another variable.
     a. Read the help for `ifelse()` to see how it works.
     b. Use `ifelse()` inside `mutate()` to create a new character column called `extra_cat`, which has the value "low" wherever `extra` is less than or equal to 0, "medium" where `extra` is between 0 and 3, and "high where `extra` is 3 or greater.
     c. Imagine the values for `extra` were all recorded wrong for subjects 1, 3, and 7, where those values should be 2 units higher.  Use `ifelse()` to create an `extra_corrected` column that corrects these values.
+    
+```{r}
+?ifelse()
+mysleep <- mutate(mysleep, extra_std_tidy2 = as.numeric(scale(extra)))
+
+mysleep<-mutate(ifelse())
+
+ifelse(first thing is true, do something) +
+
+mysleep$extra_cat<-
+  
+  mysleep<-mysleep %>% mutate(extra_sqrt = sqrt(abs(extra)))
+
+mysleep<-mysleep %>% mutate(extra_cat = ifelse(extra < 0, "low"), ifelse(extra >=3, "high", "medium")
+
+
+mysleep<-mysleep %>% mutate(extra_corrected = ifelse(ID=c("1","3","7"), extra+2, extra))
+
+```
+
 
 ## Extension Exercise #2
 
@@ -346,6 +390,8 @@ So let's make our geometric mean function.  Here's an initial version:
 geomean <- function(x) {
   exp(mean(log(x)))
 }
+geomean(c(1,2,3))
+
 ```
 
 This is the laziest possible version (well, almost -- we could also put the whole thing on one line and leave out the curly braces if we wanted).  We don't have an explicit `return()` statement, but because the single line of code in our function returns the value we want (or think we want), this value is what gets returned when we run our function.  Let's try this function on the `extra` variable in the `sleep` column.
@@ -370,6 +416,8 @@ if(any(x == 0)) {
 }
 x
 any(x == 0)
+
+
 ```
 
 I've illustrated a couple of tricks here.  First, the use of `if()`. This function checks its argument for whether it is `TRUE` or `FALSE`, and if it's `TRUE`, it runs all of the code in the following curly braces.  If it's `FALSE`, then it just skips that code.
@@ -401,6 +449,44 @@ In English, this means to take the standard deviation of the variable and divide
 2. Revisit the `sleep` data again (again saving a copy called `mysleep` in the workspace) and create a `sleep_cellmeans` summary table that has the mean and standard error for both groups.
 
 3. 95% confidence intervals are usually associated with $\pm$ 1.96 standard errors (and some people round this up to 2). Using either `geom_bar() + geom_errorbar()` or `geom_pointrange()`, plot the means and 95% confidence intervals around those means using the table in #2.
+
+```{r}
+std.err
+geomean <- function(x) {
+  exp(mean(log(x)))
+}
+geomean(c(1,2,3))
+
+std.err<-function(x) {
+  sd(x)
+}
+#example
+fahrenheit_to_kelvin <- function(temp_F) {
+  temp_C <- fahrenheit_to_celsius(temp_F)
+  temp_K <- celsius_to_kelvin(temp_C)
+  return(temp_K)
+}
+
+std.err<-function(vector) {
+  std.dev<-sd(vector)
+  std.err<-std.dev/(sqrt(length(vector)))
+  return(std.err)
+}
+
+std.err2<-function(vector) {
+  std.err<-sd(vector)/(sqrt(length(vector)))
+  return(std.err)
+}
+
+vector<-c(1,2,3,4,5)
+std.err(vector)
+sd(vector)/sqrt(5)
+
+std.err2(vector)
+
+
+```
+
 
 ## Extension Exercise #5
 
